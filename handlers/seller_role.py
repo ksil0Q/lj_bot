@@ -73,7 +73,13 @@ async def not_confirm_role(message: types.Message, state: FSMContext):
     await state.clear()
 
 
-# @router.message(SellerRole.payment_confirm, F.text.in_(Tariff.get_names()))
+@router.message(SellerRole.payment_confirm, F.text.casefold() == 'отмена')
+async def back_button(message: types.Message, state: FSMContext):
+    await state.set_data({})
+    await state.set_state(SellerRole.confirm)
+    await confirm_role(message, state)
+
+
 @router.message(SellerRole.payment_confirm)
 async def payment_agree(message: types.Message, state: FSMContext):
     tariff_id = await Tariff.get_id_by_name(message.text)
